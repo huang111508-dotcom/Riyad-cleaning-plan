@@ -48,6 +48,14 @@ const ContentBox: React.FC<{
   </div>
 );
 
+const AppLogo = () => (
+  <svg className="w-11 h-11 rounded-lg shadow-md border-2 border-green-500/50" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100" height="100" fill="#16a34a" /> 
+    <text x="50" y="45" fontSize="28" fontWeight="900" textAnchor="middle" fill="white" fontFamily="sans-serif">Riyadh</text>
+    <text x="50" y="75" fontSize="28" fontWeight="900" textAnchor="middle" fill="white" fontFamily="sans-serif">clean</text>
+  </svg>
+);
+
 const App: React.FC = () => {
   // Data State
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -169,12 +177,12 @@ const App: React.FC = () => {
         <div className="max-w-3xl mx-auto px-4 py-3">
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-3">
-              <div className="bg-white/10 p-2 rounded-xl backdrop-blur-sm border border-white/10">
-                 <CheckSquare className="w-6 h-6 text-teal-50" />
-              </div>
+              <AppLogo />
               <div>
-                <h1 className="text-lg font-bold leading-none">{lang === 'cn' ? '门店清洁计划' : 'CleanSync'}</h1>
-                <p className="text-xs text-teal-200 mt-1 opacity-80">{lang === 'cn' ? '智能管理系统' : 'Management System'}</p>
+                <h1 className="text-xl font-black leading-none tracking-tight">Riyadh Clean</h1>
+                <p className="text-xs text-teal-200 mt-0.5 opacity-90 font-medium">
+                  {lang === 'cn' ? '门店清洁智能管理系统' : 'Store Cleaning Management'}
+                </p>
               </div>
             </div>
             
