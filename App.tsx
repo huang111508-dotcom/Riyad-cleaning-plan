@@ -114,15 +114,26 @@ const MainApp: React.FC = () => {
 
   // Initialize Data
   useEffect(() => {
+    // Safety timeout: If data doesn't load in 4 seconds, show the app anyway
+    const safetyTimer = setTimeout(() => {
+      console.warn("Data loading timed out, showing empty state.");
+      setLoading(false);
+    }, 4000);
+
     initializeDataIfEmpty();
+    
     const unsubDept = subscribeToDepartments((depts) => {
       setDepartments(depts);
       setLoading(false);
+      clearTimeout(safetyTimer);
     });
+    
     const unsubTasks = subscribeToTasks((t) => setTasks(t));
+    
     return () => {
       unsubDept();
       unsubTasks();
+      clearTimeout(safetyTimer);
     };
   }, []);
 
@@ -194,7 +205,12 @@ const MainApp: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-gray-50 text-teal-600"><CheckSquare className="w-10 h-10 animate-bounce"/></div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-teal-600 flex-col gap-3">
+        <CheckSquare className="w-10 h-10 animate-bounce"/>
+        <span className="text-sm font-medium animate-pulse">Loading CleanSync...</span>
+      </div>
+    );
   }
 
   return (
@@ -267,6 +283,7 @@ const MainApp: React.FC = () => {
                       {d.name[lang]}
                     </option>
                   ))}
+                  {departments.length === 0 && <option>Loading...</option>}
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-teal-200">
                   <svg className="fill-current h-4 w-4" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>

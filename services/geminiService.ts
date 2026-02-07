@@ -1,13 +1,16 @@
 import { GoogleGenAI } from "@google/genai";
 
-// Safely access API Key to avoid "process is not defined" error in browsers
+// Lazy variable to hold the instance
+let aiClient: GoogleGenAI | null = null;
+
+// Safely access API Key
 const getApiKey = () => {
   try {
-    // Check for standard process.env (Node/Webpack/Polyfilled)
+    // Check for standard process.env
     if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
       return process.env.API_KEY;
     }
-    // Check for Vite standard (import.meta.env)
+    // Check for Vite standard
     // @ts-ignore
     if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_KEY) {
        // @ts-ignore
@@ -19,23 +22,27 @@ const getApiKey = () => {
   return '';
 };
 
-const apiKey = getApiKey();
-const ai = new GoogleGenAI({ apiKey });
-
 export const translateText = async (text: string, targetLang: 'en' | 'cn' = 'en'): Promise<string> => {
   if (!text) return '';
-  if (!apiKey) {
-    console.warn("No API Key provided. Returning original text with mock prefix.");
-    return `[Mock Translated] ${text}`;
-  }
 
   try {
+    // Initialize client ONLY when needed (Lazy Load)
+    // This prevents the app from crashing on startup if the API key is missing or SDK fails to load
+    if (!aiClient) {
+      const apiKey = getApiKey();
+      if (!apiKey) {
+        console.warn("No API Key provided. Returning original text with mock prefix.");
+        return `[Mock Translated] ${text}`;
+      }
+      aiClient = new GoogleGenAI({ apiKey });
+    }
+
     const prompt = `Translate the following text related to store cleaning procedures into ${targetLang === 'en' ? 'English' : 'Chinese'}. 
     Return ONLY the translated text without any explanations or markdown.
     
     Text: "${text}"`;
 
-    const response = await ai.models.generateContent({
+    const response = await aiClient.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
     });

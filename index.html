@@ -7,8 +7,26 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><rect width=%22512%22 height=%22512%22 rx=%22100%22 fill=%22%2316a34a%22/><text x=%2250%25%22 y=%2243%25%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22900%22 font-size=%22130%22 fill=%22white%22>Riyadh</text><text x=%2250%25%22 y=%2272%25%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22900%22 font-size=%22130%22 fill=%22white%22>clean</text></svg>" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      // Polyfill process.env to prevent crash in browser environments
+      // Polyfill process.env
       window.process = window.process || { env: {} };
+      
+      // Global error trap to visualize white-screen errors
+      window.addEventListener('error', function(event) {
+         console.error(event);
+         // Do not overwrite body if React is already mounted
+         const root = document.getElementById('root');
+         if(root && root.innerHTML.trim() === '') {
+            document.body.innerHTML += '<div style="background:white; color:red; padding:20px; border: 2px solid red; margin: 20px;"><strong>App Crash:</strong> ' + event.message + '</div>';
+         }
+      });
+      
+      window.addEventListener('unhandledrejection', function(event) {
+         console.error(event);
+         const root = document.getElementById('root');
+         if(root && root.innerHTML.trim() === '') {
+            document.body.innerHTML += '<div style="background:white; color:red; padding:20px; border: 2px solid red; margin: 20px;"><strong>Unhandled Promise:</strong> ' + event.reason + '</div>';
+         }
+      });
     </script>
     <style>
       body {
