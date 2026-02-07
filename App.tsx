@@ -3,8 +3,36 @@ import { Department, Role, Task, Language, Frequency } from './types';
 import { DAYS_OF_WEEK, WEEKS_OF_MONTH } from './constants';
 import { AdminTaskModal } from './components/AdminTaskModal';
 import { AdminDeptManager } from './components/AdminDeptManager';
-import { Settings, Globe, CheckSquare, Edit3, Lock, LogOut, PlusCircle, Building2 } from 'lucide-react';
+import { Settings, Globe, CheckSquare, Edit3, Lock, LogOut, PlusCircle, Building2, AlertTriangle } from 'lucide-react';
 import { subscribeToDepartments, subscribeToTasks, saveTask, initializeDataIfEmpty } from './services/dataService';
+
+// Error Boundary Component
+class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: Error | null}> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50 text-center">
+          <AlertTriangle className="w-12 h-12 text-red-500 mb-4" />
+          <h2 className="text-xl font-bold text-gray-800 mb-2">Something went wrong</h2>
+          <p className="text-sm text-gray-600 max-w-md bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+            {this.state.error?.message}
+          </p>
+          <button onClick={() => window.location.reload()} className="mt-6 px-4 py-2 bg-teal-600 text-white rounded-lg">
+            Reload App
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 // Component for a single "Box" (Title or Details)
 const ContentBox: React.FC<{
@@ -49,14 +77,14 @@ const ContentBox: React.FC<{
 );
 
 const AppLogo = () => (
-  <svg className="w-11 h-11 rounded-lg shadow-md border-2 border-green-500/50" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <svg className="w-12 h-12 rounded-lg shadow-md border-2 border-green-500/50 bg-green-600" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
     <rect width="100" height="100" fill="#16a34a" /> 
-    <text x="50" y="45" fontSize="28" fontWeight="900" textAnchor="middle" fill="white" fontFamily="sans-serif">Riyadh</text>
-    <text x="50" y="75" fontSize="28" fontWeight="900" textAnchor="middle" fill="white" fontFamily="sans-serif">clean</text>
+    <text x="50" y="42" fontSize="24" fontWeight="900" textAnchor="middle" fill="white" fontFamily="Arial, sans-serif" style={{textTransform: 'uppercase'}}>Riyadh</text>
+    <text x="50" y="78" fontSize="24" fontWeight="900" textAnchor="middle" fill="white" fontFamily="Arial, sans-serif" style={{textTransform: 'uppercase'}}>clean</text>
   </svg>
 );
 
-const App: React.FC = () => {
+const MainApp: React.FC = () => {
   // Data State
   const [departments, setDepartments] = useState<Department[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -461,6 +489,12 @@ const App: React.FC = () => {
     </div>
   );
 };
+
+const App: React.FC = () => (
+  <ErrorBoundary>
+    <MainApp />
+  </ErrorBoundary>
+);
 
 const XIcon = () => (
   <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
