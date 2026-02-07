@@ -6,6 +6,10 @@
     <title>Riyadh Clean</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22><rect width=%22512%22 height=%22512%22 rx=%22100%22 fill=%22%2316a34a%22/><text x=%2250%25%22 y=%2243%25%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22900%22 font-size=%22130%22 fill=%22white%22>Riyadh</text><text x=%2250%25%22 y=%2272%25%22 text-anchor=%22middle%22 font-family=%22sans-serif%22 font-weight=%22900%22 font-size=%22130%22 fill=%22white%22>clean</text></svg>" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Polyfill process.env to prevent crash in browser environments (Vercel/Vite)
+      window.process = window.process || { env: {} };
+    </script>
     <style>
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -27,9 +31,9 @@
     "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
     "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
     "@google/genai": "https://esm.sh/@google/genai@^1.40.0",
-    "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
-    "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
-    "firebase/": "https://esm.sh/firebase@^12.9.0/"
+    "firebase/app": "https://esm.sh/firebase@10.12.0/app",
+    "firebase/firestore": "https://esm.sh/firebase@10.12.0/firestore",
+    "firebase/": "https://esm.sh/firebase@10.12.0/"
   }
 }
 </script>
