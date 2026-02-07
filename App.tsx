@@ -57,7 +57,8 @@ const ContentBox: React.FC<{
         </button>
       )}
     </div>
-    <div className={`${isTitle ? 'text-lg font-bold text-gray-800' : 'text-sm text-gray-600 leading-relaxed whitespace-pre-wrap'}`}>
+    {/* Removed font-bold, updated to text-gray-800 for title */}
+    <div className={`${isTitle ? 'text-lg text-gray-800' : 'text-sm text-gray-600 leading-relaxed whitespace-pre-wrap'}`}>
       {content || (
         <span className="text-gray-400 italic text-sm">
           {isAdmin ? "Click edit to add content..." : "No content defined."}
@@ -290,7 +291,8 @@ const MainApp: React.FC = () => {
                 >
                   {departments.map(d => (
                     <option key={d.id} value={d.id} className="text-gray-900 bg-white">
-                      {d.name[lang]}
+                      {/* Added fallback to CN if selected lang is empty */}
+                      {d.name[lang] || d.name['cn']}
                     </option>
                   ))}
                   {departments.length === 0 && <option>Loading...</option>}
@@ -313,7 +315,8 @@ const MainApp: React.FC = () => {
                 >
                    {selectedDept?.roles?.map(r => (
                     <option key={r.id} value={r.id} className="text-gray-900 bg-white">
-                      {r.name[lang]}
+                      {/* Added fallback to CN if selected lang is empty */}
+                      {r.name[lang] || r.name['cn']}
                     </option>
                   ))}
                   {(!selectedDept?.roles?.length) && <option className="text-gray-500">No roles</option>}
@@ -336,7 +339,7 @@ const MainApp: React.FC = () => {
                 >
                    {WEEKS_OF_MONTH.map(w => (
                      <option key={w.val} value={w.val} className="text-gray-900 bg-white">
-                       {w.label[lang]}
+                       {w.label[lang] || w.label['cn']}
                      </option>
                    ))}
                 </select>
@@ -358,7 +361,7 @@ const MainApp: React.FC = () => {
                   >
                     {DAYS_OF_WEEK.map(d => (
                        <option key={d.val} value={d.val} className="text-gray-900 bg-white">
-                         {d.label[lang]}
+                         {d.label[lang] || d.label['cn']}
                        </option>
                      ))}
                   </select>
@@ -384,7 +387,7 @@ const MainApp: React.FC = () => {
              <div className="md:col-span-1">
                 <ContentBox 
                   label={lang === 'cn' ? '日清计划内容' : 'Daily Plan Content'}
-                  content={dailyTask?.title[lang] || ''}
+                  content={dailyTask?.title[lang] || dailyTask?.title['cn'] || ''}
                   isEmpty={!dailyTask}
                   isAdmin={isAdminMode}
                   onEdit={() => handleEditClick('daily', dailyTask)}
@@ -394,7 +397,7 @@ const MainApp: React.FC = () => {
              <div className="md:col-span-2">
                 <ContentBox 
                   label={lang === 'cn' ? '清洁细则' : 'Cleaning Details'}
-                  content={dailyTask?.details[lang] || ''}
+                  content={dailyTask?.details[lang] || dailyTask?.details['cn'] || ''}
                   isEmpty={!dailyTask}
                   isAdmin={isAdminMode}
                   onEdit={() => handleEditClick('daily', dailyTask)}
@@ -407,7 +410,7 @@ const MainApp: React.FC = () => {
         <section className="animate-in slide-in-from-bottom-2 duration-500 delay-100">
            <div className="flex items-center gap-2 mb-3">
              <span className="bg-orange-100 text-orange-800 text-xs font-bold px-2 py-1 rounded-md uppercase">
-               {DAYS_OF_WEEK.find(d => d.val === selectedDay)?.label[lang]}
+               {DAYS_OF_WEEK.find(d => d.val === selectedDay)?.label[lang] || DAYS_OF_WEEK.find(d => d.val === selectedDay)?.label['cn']}
              </span>
              <h2 className="text-lg font-bold text-gray-800">{lang === 'cn' ? '周清计划' : 'Weekly Plan'}</h2>
           </div>
@@ -415,7 +418,7 @@ const MainApp: React.FC = () => {
              <div className="md:col-span-1">
                 <ContentBox 
                   label={lang === 'cn' ? '周清计划内容' : 'Weekly Plan Content'}
-                  content={weeklyTask?.title[lang] || ''}
+                  content={weeklyTask?.title[lang] || weeklyTask?.title['cn'] || ''}
                   isEmpty={!weeklyTask}
                   isAdmin={isAdminMode}
                   onEdit={() => handleEditClick('weekly', weeklyTask)}
@@ -425,7 +428,7 @@ const MainApp: React.FC = () => {
              <div className="md:col-span-2">
                 <ContentBox 
                   label={lang === 'cn' ? '清洁细则' : 'Cleaning Details'}
-                  content={weeklyTask?.details[lang] || ''}
+                  content={weeklyTask?.details[lang] || weeklyTask?.details['cn'] || ''}
                   isEmpty={!weeklyTask}
                   isAdmin={isAdminMode}
                   onEdit={() => handleEditClick('weekly', weeklyTask)}
@@ -446,7 +449,7 @@ const MainApp: React.FC = () => {
              <div className="md:col-span-1">
                 <ContentBox 
                   label={lang === 'cn' ? '月清计划内容' : 'Monthly Plan Content'}
-                  content={monthlyTask?.title[lang] || ''}
+                  content={monthlyTask?.title[lang] || monthlyTask?.title['cn'] || ''}
                   isEmpty={!monthlyTask}
                   isAdmin={isAdminMode}
                   onEdit={() => handleEditClick('monthly', monthlyTask)}
@@ -456,7 +459,7 @@ const MainApp: React.FC = () => {
              <div className="md:col-span-2">
                 <ContentBox 
                   label={lang === 'cn' ? '清洁细则' : 'Cleaning Details'}
-                  content={monthlyTask?.details[lang] || ''}
+                  content={monthlyTask?.details[lang] || monthlyTask?.details['cn'] || ''}
                   isEmpty={!monthlyTask}
                   isAdmin={isAdminMode}
                   onEdit={() => handleEditClick('monthly', monthlyTask)}

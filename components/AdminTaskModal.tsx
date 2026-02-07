@@ -83,8 +83,8 @@ export const AdminTaskModal: React.FC<AdminTaskModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="flex justify-between items-center p-4 border-b bg-gray-50">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
+        <div className="flex justify-between items-center p-4 border-b bg-gray-50 flex-shrink-0">
           <div>
              <h2 className="text-xl font-bold text-gray-800">
                {initialTask ? '编辑计划 (Edit Plan)' : '创建计划 (Create Plan)'}
@@ -98,7 +98,7 @@ export const AdminTaskModal: React.FC<AdminTaskModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
           <div className="flex justify-between items-center">
              <span className="text-sm font-bold text-gray-900">内容详情 Content</span>
              <button
@@ -115,23 +115,23 @@ export const AdminTaskModal: React.FC<AdminTaskModalProps> = ({
           <div className="space-y-4">
              <div>
                <label className="block text-xs font-medium text-gray-500 mb-1">计划内容 (Plan Content - CN)</label>
-               <input 
-                 type="text" 
+               <textarea 
                  value={titleCn}
                  onChange={(e) => setTitleCn(e.target.value)}
-                 className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all"
+                 className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all resize-none"
                  placeholder="例如：清洁灶台"
                  required
+                 rows={2}
                />
              </div>
              <div>
                <label className="block text-xs font-medium text-gray-500 mb-1">Plan Content (EN)</label>
-               <input 
-                 type="text" 
+               <textarea 
                  value={titleEn}
                  onChange={(e) => setTitleEn(e.target.value)}
-                 className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-teal-500 outline-none transition-all"
+                 className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-teal-500 outline-none transition-all resize-none"
                  placeholder="e.g., Clean Stove Tops"
+                 rows={2}
                />
              </div>
 
@@ -155,23 +155,24 @@ export const AdminTaskModal: React.FC<AdminTaskModalProps> = ({
                />
              </div>
           </div>
-
-          <div className="pt-4 flex space-x-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 font-medium transition-colors"
-            >
-              取消 Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-1 px-4 py-2.5 bg-teal-600 rounded-xl text-white hover:bg-teal-700 font-medium shadow-lg shadow-teal-600/20 transition-all active:scale-[0.98]"
-            >
-              保存 Save
-            </button>
-          </div>
         </form>
+
+        <div className="p-4 border-t bg-gray-50 flex space-x-3 flex-shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex-1 px-4 py-2.5 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+          >
+            取消 Cancel
+          </button>
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            className="flex-1 px-4 py-2.5 bg-teal-600 rounded-xl text-white hover:bg-teal-700 font-medium shadow-lg shadow-teal-600/20 transition-all active:scale-[0.98]"
+          >
+            保存 Save
+          </button>
+        </div>
       </div>
     </div>
   );
