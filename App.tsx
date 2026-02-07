@@ -77,10 +77,10 @@ const ContentBox: React.FC<{
 );
 
 const AppLogo = () => (
-  <svg className="w-12 h-12 rounded-lg shadow-md border-2 border-green-500/50 bg-green-600" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <svg className="w-12 h-12 rounded-lg shadow-md border-2 border-green-500/50 bg-green-600 flex-shrink-0" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
     <rect width="100" height="100" fill="#16a34a" /> 
-    <text x="50" y="42" fontSize="24" fontWeight="900" textAnchor="middle" fill="white" fontFamily="Arial, sans-serif" style={{textTransform: 'uppercase'}}>Riyadh</text>
-    <text x="50" y="78" fontSize="24" fontWeight="900" textAnchor="middle" fill="white" fontFamily="Arial, sans-serif" style={{textTransform: 'uppercase'}}>clean</text>
+    <text x="50" y="45" fontSize="24" fontWeight="900" textAnchor="middle" fill="white" fontFamily="sans-serif">Riyadh</text>
+    <text x="50" y="75" fontSize="24" fontWeight="900" textAnchor="middle" fill="white" fontFamily="sans-serif">clean</text>
   </svg>
 );
 
