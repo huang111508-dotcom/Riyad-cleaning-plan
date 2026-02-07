@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Department, Role } from '../types';
 import { X, Plus, Trash2, Save } from 'lucide-react';
 import { saveDepartment, deleteDepartment } from '../services/dataService';
@@ -17,6 +17,19 @@ export const AdminDeptManager: React.FC<AdminDeptManagerProps> = ({ isOpen, onCl
   // New Dept State
   const [isCreating, setIsCreating] = useState(false);
   const [newDeptNameCn, setNewDeptNameCn] = useState('');
+
+  // Sync editingDept with departments prop to ensure we have latest data (e.g. if roles updated elsewhere)
+  // However, we only want to update if the ID matches, to preserve local editing state if needed.
+  useEffect(() => {
+    if (editingDept) {
+      const latest = departments.find(d => d.id === editingDept.id);
+      if (latest && JSON.stringify(latest) !== JSON.stringify(editingDept)) {
+        // Only update if we are not in the middle of a local optimistic update that hasn't saved yet
+        // For simplicity in this app, we trust props as source of truth when they arrive
+        setEditingDept(latest);
+      }
+    }
+  }, [departments]);
 
   const handleCreateDept = async () => {
     if (!newDeptNameCn) return;
@@ -40,29 +53,44 @@ export const AdminDeptManager: React.FC<AdminDeptManagerProps> = ({ isOpen, onCl
 
   const handleAddRole = async () => {
     if (!editingDept || !newRoleNameCn) return;
+    
+    // Optimistic / Loading state could be added here
     const nameEn = await translateText(newRoleNameCn, 'en');
+    
     const newRole: Role = {
-      id: `role_${Date.now()}`,
+      id: `role_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
       name: { cn: newRoleNameCn, en: nameEn }
     };
-    const updatedDept = {
+    
+    // Defensive: Ensure roles is an array
+    const currentRoles = Array.isArray(editingDept.roles) ? editingDept.roles : [];
+
+    const updatedDept: Department = {
       ...editingDept,
-      roles: [...editingDept.roles, newRole]
+      roles: [...currentRoles, newRole]
     };
-    await saveDepartment(updatedDept);
+
+    // Update local state immediately for responsiveness
     setEditingDept(updatedDept);
     setNewRoleNameCn('');
+
+    // Save to backend
+    await saveDepartment(updatedDept);
   };
 
   const handleDeleteRole = async (roleId: string) => {
     if (!editingDept) return;
     if (!window.confirm('Delete this role?')) return;
-    const updatedDept = {
+    
+    const currentRoles = Array.isArray(editingDept.roles) ? editingDept.roles : [];
+    
+    const updatedDept: Department = {
       ...editingDept,
-      roles: editingDept.roles.filter(r => r.id !== roleId)
+      roles: currentRoles.filter(r => r.id !== roleId)
     };
-    await saveDepartment(updatedDept);
+    
     setEditingDept(updatedDept);
+    await saveDepartment(updatedDept);
   };
 
   if (!isOpen) return null;
@@ -132,21 +160,22 @@ export const AdminDeptManager: React.FC<AdminDeptManagerProps> = ({ isOpen, onCl
                    Roles in {editingDept.name.cn}
                  </h3>
                  <div className="space-y-2 mb-4">
-                   {editingDept.roles.map(role => (
-                     <div key={role.id} className="bg-white p-2 rounded shadow-sm flex justify-between items-center">
-                        <div>
-                          <span className="text-sm font-medium text-gray-800">{role.name.cn}</span>
-                          <span className="text-xs text-gray-400 ml-2">{role.name.en}</span>
-                        </div>
-                        <button 
-                          onClick={() => handleDeleteRole(role.id)}
-                          className="text-gray-300 hover:text-red-500"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                     </div>
-                   ))}
-                   {editingDept.roles.length === 0 && (
+                   {editingDept.roles && editingDept.roles.length > 0 ? (
+                     editingDept.roles.map(role => (
+                       <div key={role.id} className="bg-white p-2 rounded shadow-sm flex justify-between items-center">
+                          <div>
+                            <span className="text-sm font-medium text-gray-800">{role.name.cn}</span>
+                            <span className="text-xs text-gray-400 ml-2">{role.name.en}</span>
+                          </div>
+                          <button 
+                            onClick={() => handleDeleteRole(role.id)}
+                            className="text-gray-300 hover:text-red-500"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                       </div>
+                     ))
+                   ) : (
                      <p className="text-xs text-gray-400 italic">No roles defined.</p>
                    )}
                  </div>

@@ -137,22 +137,32 @@ const MainApp: React.FC = () => {
     };
   }, []);
 
-  // Initialize Selection Defaults
+  // Initialize and Validate Selection Defaults
   useEffect(() => {
-    if (departments.length > 0 && !selectedDeptId) {
-      setSelectedDeptId(departments[0].id);
+    if (departments.length > 0) {
+      // If no dept selected, OR the currently selected dept ID is no longer in the list (deleted/stale)
+      const isValid = departments.find(d => d.id === selectedDeptId);
+      if (!selectedDeptId || !isValid) {
+        setSelectedDeptId(departments[0].id);
+      }
     }
   }, [departments, selectedDeptId]);
 
+  // Derived selectedDept
   const selectedDept = departments.find(d => d.id === selectedDeptId);
 
+  // Auto-select Role Logic
   useEffect(() => {
-    if (selectedDept && selectedDept.roles.length > 0) {
-      // If current role invalid for new dept, reset
-      if (!selectedDept.roles.find(r => r.id === selectedRoleId)) {
+    if (selectedDept && selectedDept.roles && selectedDept.roles.length > 0) {
+      // Check if current selectedRoleId is valid for this department
+      const roleExists = selectedDept.roles.find(r => r.id === selectedRoleId);
+      
+      // If no role selected OR selected role not found in this department, default to first role
+      if (!selectedRoleId || !roleExists) {
         setSelectedRoleId(selectedDept.roles[0].id);
       }
     } else {
+      // If department has no roles, clear selection
       setSelectedRoleId('');
     }
   }, [selectedDept, selectedRoleId]);
@@ -301,12 +311,12 @@ const MainApp: React.FC = () => {
                   onChange={(e) => setSelectedRoleId(e.target.value)}
                   className="w-full bg-black/20 text-white text-sm rounded-lg pl-3 pr-8 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400 appearance-none border border-transparent focus:border-teal-400 transition-all"
                 >
-                   {selectedDept?.roles.map(r => (
+                   {selectedDept?.roles?.map(r => (
                     <option key={r.id} value={r.id} className="text-gray-900 bg-white">
                       {r.name[lang]}
                     </option>
                   ))}
-                  {(!selectedDept?.roles.length) && <option className="text-gray-500">No roles</option>}
+                  {(!selectedDept?.roles?.length) && <option className="text-gray-500">No roles</option>}
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-teal-200">
                   <svg className="fill-current h-4 w-4" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>

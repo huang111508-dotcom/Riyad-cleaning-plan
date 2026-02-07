@@ -3,36 +3,19 @@ import { GoogleGenAI } from "@google/genai";
 // Lazy variable to hold the instance
 let aiClient: GoogleGenAI | null = null;
 
-// Safely access API Key
-const getApiKey = () => {
-  try {
-    // Check for standard process.env
-    if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
-      return process.env.API_KEY;
-    }
-    // Check for Vite standard
-    // @ts-ignore
-    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_KEY) {
-       // @ts-ignore
-       return import.meta.env.VITE_API_KEY;
-    }
-  } catch (e) {
-    console.warn("Could not read API Key from environment.");
-  }
-  return '';
-};
-
 export const translateText = async (text: string, targetLang: 'en' | 'cn' = 'en'): Promise<string> => {
   if (!text) return '';
 
   try {
     // Initialize client ONLY when needed (Lazy Load)
-    // This prevents the app from crashing on startup if the API key is missing or SDK fails to load
     if (!aiClient) {
-      const apiKey = getApiKey();
+      // Directly access process.env.API_KEY as per system requirements
+      const apiKey = process.env.API_KEY;
+      
       if (!apiKey) {
-        console.warn("No API Key provided. Returning original text with mock prefix.");
-        return `[Mock Translated] ${text}`;
+        console.warn("API Key is missing in process.env.API_KEY. Returning original text.");
+        // Return original text directly without "[Mock Translated]" prefix to improve UX
+        return text;
       }
       aiClient = new GoogleGenAI({ apiKey });
     }
@@ -50,6 +33,6 @@ export const translateText = async (text: string, targetLang: 'en' | 'cn' = 'en'
     return response.text?.trim() || text;
   } catch (error) {
     console.error("Translation failed:", error);
-    return text; // Fallback to original
+    return text; // Fallback to original text on error
   }
 };
