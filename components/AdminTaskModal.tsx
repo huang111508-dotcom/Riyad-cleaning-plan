@@ -114,7 +114,7 @@ export const AdminTaskModal: React.FC<AdminTaskModalProps> = ({
 
           <div className="space-y-4">
              <div>
-               <label className="block text-xs font-medium text-gray-500 mb-1">计划标题 (Plan Title - CN)</label>
+               <label className="block text-xs font-medium text-gray-500 mb-1">计划内容 (Plan Content - CN)</label>
                <input 
                  type="text" 
                  value={titleCn}
@@ -125,7 +125,7 @@ export const AdminTaskModal: React.FC<AdminTaskModalProps> = ({
                />
              </div>
              <div>
-               <label className="block text-xs font-medium text-gray-500 mb-1">Plan Title (EN)</label>
+               <label className="block text-xs font-medium text-gray-500 mb-1">Plan Content (EN)</label>
                <input 
                  type="text" 
                  value={titleEn}

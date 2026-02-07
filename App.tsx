@@ -383,7 +383,7 @@ const MainApp: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
              <div className="md:col-span-1">
                 <ContentBox 
-                  label={lang === 'cn' ? '计划标题' : 'Task Title'}
+                  label={lang === 'cn' ? '日清计划内容' : 'Daily Plan Content'}
                   content={dailyTask?.title[lang] || ''}
                   isEmpty={!dailyTask}
                   isAdmin={isAdminMode}
@@ -414,7 +414,7 @@ const MainApp: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
              <div className="md:col-span-1">
                 <ContentBox 
-                  label={lang === 'cn' ? '计划标题' : 'Task Title'}
+                  label={lang === 'cn' ? '周清计划内容' : 'Weekly Plan Content'}
                   content={weeklyTask?.title[lang] || ''}
                   isEmpty={!weeklyTask}
                   isAdmin={isAdminMode}
@@ -445,7 +445,7 @@ const MainApp: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
              <div className="md:col-span-1">
                 <ContentBox 
-                  label={lang === 'cn' ? '计划标题' : 'Task Title'}
+                  label={lang === 'cn' ? '月清计划内容' : 'Monthly Plan Content'}
                   content={monthlyTask?.title[lang] || ''}
                   isEmpty={!monthlyTask}
                   isAdmin={isAdminMode}
