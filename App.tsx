@@ -6,13 +6,22 @@ import { AdminDeptManager } from './components/AdminDeptManager';
 import { Settings, Globe, CheckSquare, Edit3, Lock, LogOut, PlusCircle, Building2, AlertTriangle } from 'lucide-react';
 import { subscribeToDepartments, subscribeToTasks, saveTask, initializeDataIfEmpty } from './services/dataService';
 
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
 // Error Boundary Component
-class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: Error | null}> {
-  constructor(props: any) {
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
   }
-  static getDerivedStateFromError(error: Error) {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
   render() {
@@ -57,8 +66,8 @@ const ContentBox: React.FC<{
         </button>
       )}
     </div>
-    {/* Removed font-bold, updated to text-gray-800 for title */}
-    <div className={`${isTitle ? 'text-lg text-gray-800' : 'text-sm text-gray-600 leading-relaxed whitespace-pre-wrap'}`}>
+    {/* Unified style: removed isTitle conditional styling to match Details exactly */}
+    <div className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
       {content || (
         <span className="text-gray-400 italic text-sm">
           {isAdmin ? "Click edit to add content..." : "No content defined."}
@@ -206,7 +215,7 @@ const MainApp: React.FC = () => {
 
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (adminPassword === '8888') {
+    if (adminPassword === '111508') {
       setIsAdminMode(true);
       setShowLoginModal(false);
       setAdminPassword('');

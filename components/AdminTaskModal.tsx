@@ -118,10 +118,9 @@ export const AdminTaskModal: React.FC<AdminTaskModalProps> = ({
                <textarea 
                  value={titleCn}
                  onChange={(e) => setTitleCn(e.target.value)}
-                 className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all resize-none"
+                 className="w-full border border-gray-300 rounded-lg p-2.5 h-48 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all resize-none"
                  placeholder="例如：清洁灶台"
                  required
-                 rows={2}
                />
              </div>
              <div>
@@ -129,9 +128,8 @@ export const AdminTaskModal: React.FC<AdminTaskModalProps> = ({
                <textarea 
                  value={titleEn}
                  onChange={(e) => setTitleEn(e.target.value)}
-                 className="w-full border border-gray-300 rounded-lg p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-teal-500 outline-none transition-all resize-none"
+                 className="w-full border border-gray-300 rounded-lg p-2.5 h-48 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-teal-500 outline-none transition-all resize-none"
                  placeholder="e.g., Clean Stove Tops"
-                 rows={2}
                />
              </div>
 
@@ -140,7 +138,7 @@ export const AdminTaskModal: React.FC<AdminTaskModalProps> = ({
                <textarea 
                  value={detailsCn}
                  onChange={(e) => setDetailsCn(e.target.value)}
-                 className="w-full border border-gray-300 rounded-lg p-2.5 h-32 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all resize-none"
+                 className="w-full border border-gray-300 rounded-lg p-2.5 h-48 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all resize-none"
                  placeholder="详细的清洁步骤..."
                  required
                />
@@ -150,7 +148,7 @@ export const AdminTaskModal: React.FC<AdminTaskModalProps> = ({
                <textarea 
                  value={detailsEn}
                  onChange={(e) => setDetailsEn(e.target.value)}
-                 className="w-full border border-gray-300 rounded-lg p-2.5 h-32 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-teal-500 outline-none transition-all resize-none"
+                 className="w-full border border-gray-300 rounded-lg p-2.5 h-48 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-teal-500 outline-none transition-all resize-none"
                  placeholder="Detailed steps..."
                />
              </div>
