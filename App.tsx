@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Component, ReactNode } from 'react';
 import { Department, Role, Task, Language, Frequency } from './types';
 import { DAYS_OF_WEEK, WEEKS_OF_MONTH } from './constants';
 import { AdminTaskModal } from './components/AdminTaskModal';
@@ -7,7 +7,7 @@ import { Settings, Globe, CheckSquare, Edit3, Lock, LogOut, PlusCircle, Building
 import { subscribeToDepartments, subscribeToTasks, saveTask, initializeDataIfEmpty } from './services/dataService';
 
 interface ErrorBoundaryProps {
-  children: React.ReactNode;
+  children?: ReactNode;
 }
 
 interface ErrorBoundaryState {
@@ -16,7 +16,7 @@ interface ErrorBoundaryState {
 }
 
 // Error Boundary Component
-class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -392,8 +392,8 @@ const MainApp: React.FC = () => {
              <span className="bg-teal-100 text-teal-800 text-xs font-bold px-2 py-1 rounded-md uppercase">Every Day</span>
              <h2 className="text-lg font-bold text-gray-800">{lang === 'cn' ? '日清计划' : 'Daily Plan'}</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-             <div className="md:col-span-1">
+          <div className="flex flex-col gap-4">
+             <div className="w-full">
                 <ContentBox 
                   label={lang === 'cn' ? '日清计划内容' : 'Daily Plan Content'}
                   content={dailyTask?.title[lang] || dailyTask?.title['cn'] || ''}
@@ -403,7 +403,7 @@ const MainApp: React.FC = () => {
                   isTitle
                 />
              </div>
-             <div className="md:col-span-2">
+             <div className="w-full">
                 <ContentBox 
                   label={lang === 'cn' ? '清洁细则' : 'Cleaning Details'}
                   content={dailyTask?.details[lang] || dailyTask?.details['cn'] || ''}
@@ -423,8 +423,8 @@ const MainApp: React.FC = () => {
              </span>
              <h2 className="text-lg font-bold text-gray-800">{lang === 'cn' ? '周清计划' : 'Weekly Plan'}</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-             <div className="md:col-span-1">
+          <div className="flex flex-col gap-4">
+             <div className="w-full">
                 <ContentBox 
                   label={lang === 'cn' ? '周清计划内容' : 'Weekly Plan Content'}
                   content={weeklyTask?.title[lang] || weeklyTask?.title['cn'] || ''}
@@ -434,7 +434,7 @@ const MainApp: React.FC = () => {
                   isTitle
                 />
              </div>
-             <div className="md:col-span-2">
+             <div className="w-full">
                 <ContentBox 
                   label={lang === 'cn' ? '清洁细则' : 'Cleaning Details'}
                   content={weeklyTask?.details[lang] || weeklyTask?.details['cn'] || ''}
@@ -454,8 +454,8 @@ const MainApp: React.FC = () => {
              </span>
              <h2 className="text-lg font-bold text-gray-800">{lang === 'cn' ? '月清计划' : 'Monthly Plan'}</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-             <div className="md:col-span-1">
+          <div className="flex flex-col gap-4">
+             <div className="w-full">
                 <ContentBox 
                   label={lang === 'cn' ? '月清计划内容' : 'Monthly Plan Content'}
                   content={monthlyTask?.title[lang] || monthlyTask?.title['cn'] || ''}
@@ -465,7 +465,7 @@ const MainApp: React.FC = () => {
                   isTitle
                 />
              </div>
-             <div className="md:col-span-2">
+             <div className="w-full">
                 <ContentBox 
                   label={lang === 'cn' ? '清洁细则' : 'Cleaning Details'}
                   content={monthlyTask?.details[lang] || monthlyTask?.details['cn'] || ''}

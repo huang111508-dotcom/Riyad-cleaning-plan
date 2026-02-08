@@ -23,7 +23,8 @@ export const translateText = async (text: string, targetLang: 'en' | 'cn' = 'en'
     const prompt = `Translate the following text related to store cleaning procedures into ${targetLang === 'en' ? 'English' : 'Chinese'}. 
     Return ONLY the translated text without any explanations or markdown.
     
-    Text: "${text}"`;
+    Text:
+    ${text}`;
 
     const response = await aiClient.models.generateContent({
       model: 'gemini-3-flash-preview',
