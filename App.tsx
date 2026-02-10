@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useMemo, Component, ReactNode } from 'react';
+import React, { Component, useState, useEffect, useMemo, ReactNode } from 'react';
 import { Department, Role, Task, Language, Frequency } from './types';
 import { DAYS_OF_WEEK, WEEKS_OF_MONTH } from './constants';
 import { AdminTaskModal } from './components/AdminTaskModal';
 import { AdminDeptManager } from './components/AdminDeptManager';
-import { Settings, Globe, CheckSquare, Edit3, Lock, LogOut, PlusCircle, Building2, AlertTriangle } from 'lucide-react';
+import { Settings, CheckSquare, Edit3, Lock, LogOut, PlusCircle, Building2, AlertTriangle } from 'lucide-react';
 import { subscribeToDepartments, subscribeToTasks, saveTask, initializeDataIfEmpty } from './services/dataService';
 
 interface ErrorBoundaryProps {
@@ -17,13 +17,19 @@ interface ErrorBoundaryState {
 
 // Error Boundary Component
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props);
-    this.state = { hasError: false, error: null };
-  }
+  state: ErrorBoundaryState = {
+    hasError: false,
+    error: null
+  };
+
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("Uncaught error:", error, errorInfo);
+  }
+
   render() {
     if (this.state.hasError) {
       return (
@@ -253,9 +259,9 @@ const MainApp: React.FC = () => {
             <div className="flex items-center gap-2">
                <button 
                 onClick={() => setLang(l => l === 'cn' ? 'en' : 'cn')}
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors text-teal-100 hover:text-white"
+                className="px-3 py-1.5 rounded-md hover:bg-white/10 transition-colors text-white font-bold text-xs border border-white/20 tracking-wide"
               >
-                <Globe className="w-5 h-5" />
+                {lang === 'cn' ? 'English' : '中文'}
               </button>
               
               {isAdminMode ? (
