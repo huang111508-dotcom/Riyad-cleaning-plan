@@ -422,14 +422,14 @@ export const parseUploadedExcel = async (
       }
     }
 
-    // Task construction
+    // Task construction (Generate unique ID for each task row so multiple tasks under same role are preserved)
     const task: Task = {
-      id: `task_${currentDept.id}_${currentRole.id}_${frequency}_${dayOfWeek || 0}_${weekOfMonth || 0}`.replace(/[^a-zA-Z0-9_]/g, '_'),
+      id: `task_${currentDept.id}_${currentRole.id}_${frequency}_${idx + 1}_${Math.random().toString(36).substr(2, 6)}`.replace(/[^a-zA-Z0-9_]/g, '_'),
       deptId: currentDept.id,
       roleId: currentRole.id,
       frequency,
-      dayOfWeek,
-      weekOfMonth,
+      ...(dayOfWeek !== undefined ? { dayOfWeek } : {}),
+      ...(weekOfMonth !== undefined ? { weekOfMonth } : {}),
       title: {
         cn: titleCn,
         en: titleEn || titleCn

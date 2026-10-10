@@ -39,6 +39,24 @@ export const restoreAllCloudData = async () => {
   }
 };
 
+// Helper to recursively remove all undefined properties from objects before Firestore writes
+export const cleanFirestoreDoc = (obj: any): any => {
+  if (obj === null || obj === undefined) return null;
+  if (Array.isArray(obj)) {
+    return obj.map(cleanFirestoreDoc).filter(item => item !== undefined);
+  }
+  if (typeof obj === 'object') {
+    const cleaned: Record<string, any> = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        cleaned[key] = cleanFirestoreDoc(value);
+      }
+    }
+    return cleaned;
+  }
+  return obj;
+};
+
 // Department Listeners
 export const subscribeToDepartments = (callback: (depts: Department[]) => void) => {
   const q = query(collection(db, DEPT_COLLECTION));
@@ -50,7 +68,7 @@ export const subscribeToDepartments = (callback: (depts: Department[]) => void) 
 };
 
 export const saveDepartment = async (dept: Department) => {
-  await setDoc(doc(db, DEPT_COLLECTION, dept.id), dept);
+  await setDoc(doc(db, DEPT_COLLECTION, dept.id), cleanFirestoreDoc(dept));
 };
 
 export const deleteDepartment = async (deptId: string) => {
@@ -68,7 +86,7 @@ export const subscribeToTasks = (callback: (tasks: Task[]) => void) => {
 };
 
 export const saveTask = async (task: Task) => {
-  await setDoc(doc(db, TASK_COLLECTION, task.id), task);
+  await setDoc(doc(db, TASK_COLLECTION, task.id), cleanFirestoreDoc(task));
 };
 
 export const deleteTask = async (taskId: string) => {
@@ -137,14 +155,14 @@ export const bulkSaveTasksAndDepartments = async (
 
   // 3. Set departments
   for (const dept of newDepartments) {
-    batch.set(doc(db, DEPT_COLLECTION, dept.id), dept);
+    batch.set(doc(db, DEPT_COLLECTION, dept.id), cleanFirestoreDoc(dept));
     opCount++;
     await commitBatchIfNeeded();
   }
 
   // 4. Set tasks
   for (const task of newTasks) {
-    batch.set(doc(db, TASK_COLLECTION, task.id), task);
+    batch.set(doc(db, TASK_COLLECTION, task.id), cleanFirestoreDoc(task));
     opCount++;
     await commitBatchIfNeeded();
   }

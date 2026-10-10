@@ -34,7 +34,7 @@ export const ExcelManagerModal: React.FC<ExcelManagerModalProps> = ({
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveProgress, setSaveProgress] = useState<string>('');
-  const [autoTranslate, setAutoTranslate] = useState(true);
+  const [autoTranslate, setAutoTranslate] = useState(false);
   const [replaceAll, setReplaceAll] = useState(true);
   const [dragActive, setDragActive] = useState(false);
 
@@ -114,15 +114,27 @@ export const ExcelManagerModal: React.FC<ExcelManagerModalProps> = ({
       let finalDepts = [...parseResult.departments];
       let finalTasks = [...parseResult.tasks];
 
-      // Auto-translate if requested for any items missing English
+      // Auto-translate if requested (process in chunks so large sheets like 300+ items don't freeze)
       if (autoTranslate) {
-        setSaveProgress(lang === 'cn' ? '正在使用 AI 自动翻译并校验英文内容...' : 'Translating missing English text with AI...');
-        for (const task of finalTasks) {
-          if (!task.title.en || task.title.en === task.title.cn) {
-            task.title.en = await translateText(task.title.cn, 'en');
-          }
-          if (!task.details.en || task.details.en === task.details.cn) {
-            task.details.en = await translateText(task.details.cn, 'en');
+        const tasksNeedingTrans = finalTasks.filter(t => !t.title.en || t.title.en === t.title.cn || !t.details.en || t.details.en === t.details.cn);
+        if (tasksNeedingTrans.length > 0) {
+          const limitCount = Math.min(tasksNeedingTrans.length, 30);
+          setSaveProgress(lang === 'cn' ? `正在使用 AI 翻译前 ${limitCount} 条英文内容...` : `Translating ${limitCount} items with AI...`);
+          
+          for (let i = 0; i < limitCount; i += 5) {
+            const batch = tasksNeedingTrans.slice(i, i + 5);
+            await Promise.all(batch.map(async (task) => {
+              try {
+                if (!task.title.en || task.title.en === task.title.cn) {
+                  task.title.en = await translateText(task.title.cn, 'en');
+                }
+                if (!task.details.en || task.details.en === task.details.cn) {
+                  task.details.en = await translateText(task.details.cn, 'en');
+                }
+              } catch (e) {
+                // Ignore single failure
+              }
+            }));
           }
         }
       }

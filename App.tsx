@@ -199,24 +199,20 @@ const MainApp: React.FC = () => {
   }, [selectedDept, selectedRoleId]);
 
   // Derived Tasks for Current Selected Department & Role:
-  // 1. Daily Task for current role
-  const dailyTask = useMemo(() => {
-    return tasks.find(t => t.deptId === selectedDeptId && t.roleId === selectedRoleId && t.frequency === 'daily');
+  // 1. Daily Tasks for current role
+  const dailyTasks = useMemo(() => {
+    return tasks.filter(t => t.deptId === selectedDeptId && t.roleId === selectedRoleId && t.frequency === 'daily');
   }, [tasks, selectedDeptId, selectedRoleId]);
 
-  // 2. Weekly Task for current role
-  const weeklyTask = useMemo(() => {
-    return tasks.find(t => t.deptId === selectedDeptId && t.roleId === selectedRoleId && t.frequency === 'weekly');
+  // 2. Weekly Tasks for current role
+  const weeklyTasks = useMemo(() => {
+    return tasks.filter(t => t.deptId === selectedDeptId && t.roleId === selectedRoleId && t.frequency === 'weekly');
   }, [tasks, selectedDeptId, selectedRoleId]);
 
-  // 3. Monthly Task for current role
-  const monthlyTask = useMemo(() => {
-    return tasks.find(t => t.deptId === selectedDeptId && t.roleId === selectedRoleId && t.frequency === 'monthly');
+  // 3. Monthly Tasks for current role
+  const monthlyTasks = useMemo(() => {
+    return tasks.filter(t => t.deptId === selectedDeptId && t.roleId === selectedRoleId && t.frequency === 'monthly');
   }, [tasks, selectedDeptId, selectedRoleId]);
-
-  // Check if current day/week matches the scheduled task
-  const isWeeklyToday = Boolean(weeklyTask && weeklyTask.dayOfWeek === selectedDay);
-  const isMonthlyToday = Boolean(monthlyTask && monthlyTask.weekOfMonth === selectedWeek && monthlyTask.dayOfWeek === selectedDay);
 
   // Handlers
   const handleEditClick = (freq: Frequency, task: Task | undefined) => {
@@ -512,32 +508,86 @@ const MainApp: React.FC = () => {
                 {lang === 'cn' ? '每日必做' : 'Every Day'}
               </span>
               <h2 className="text-lg font-bold text-gray-800">{lang === 'cn' ? '日清计划' : 'Daily Plan'}</h2>
+              {dailyTasks.length > 1 && (
+                <span className="text-xs bg-teal-50 text-teal-700 font-bold px-2 py-0.5 rounded-full border border-teal-200">
+                  {dailyTasks.length} 项
+                </span>
+              )}
             </div>
-            <span className="text-xs text-gray-500 font-medium">
-              {lang === 'cn' ? '日清频次: 每天营业结束前完成' : 'Daily: Complete before closing'}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500 font-medium hidden sm:inline">
+                {lang === 'cn' ? '营业结束前完成' : 'Complete daily'}
+              </span>
+              {isAdminMode && (
+                <button
+                  onClick={() => handleEditClick('daily', undefined)}
+                  className="text-xs bg-teal-50 hover:bg-teal-100 text-teal-700 px-2 py-1 rounded font-semibold flex items-center gap-1 transition-colors"
+                >
+                  <PlusCircle className="w-3.5 h-3.5" />
+                  <span>{lang === 'cn' ? '添加日清' : 'Add Daily'}</span>
+                </button>
+              )}
+            </div>
           </div>
 
-          <div className="flex flex-col gap-4">
-             <div className="w-full">
+          <div className="space-y-4">
+            {dailyTasks.length === 0 ? (
+              <div className="flex flex-col gap-4">
                 <ContentBox 
                   label={lang === 'cn' ? '日清计划内容' : 'Daily Plan Content'}
-                  content={dailyTask?.title[lang] || dailyTask?.title['cn'] || ''}
-                  isEmpty={!dailyTask}
+                  content=""
+                  isEmpty={true}
                   isAdmin={isAdminMode}
-                  onEdit={() => handleEditClick('daily', dailyTask)}
+                  onEdit={() => handleEditClick('daily', undefined)}
                   isTitle
                 />
-             </div>
-             <div className="w-full">
                 <ContentBox 
                   label={lang === 'cn' ? '清洁细则' : 'Cleaning Details'}
-                  content={dailyTask?.details[lang] || dailyTask?.details['cn'] || ''}
-                  isEmpty={!dailyTask}
+                  content=""
+                  isEmpty={true}
                   isAdmin={isAdminMode}
-                  onEdit={() => handleEditClick('daily', dailyTask)}
+                  onEdit={() => handleEditClick('daily', undefined)}
                 />
-             </div>
+              </div>
+            ) : (
+              dailyTasks.map((t, idx) => (
+                <div key={t.id} className={dailyTasks.length > 1 ? "bg-white/80 p-3 rounded-2xl border border-gray-200/80 shadow-sm space-y-3" : "space-y-4"}>
+                  {dailyTasks.length > 1 && (
+                    <div className="flex justify-between items-center text-xs font-bold text-teal-800 pb-1 border-b border-gray-100">
+                      <span className="bg-teal-50 px-2 py-0.5 rounded">
+                        {lang === 'cn' ? `日清项目 #${idx + 1}` : `Daily Item #${idx + 1}`}
+                      </span>
+                      {isAdminMode && (
+                        <button
+                          onClick={() => handleEditClick('daily', t)}
+                          className="text-teal-600 hover:text-teal-800 flex items-center gap-1"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                          <span>编辑</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  <div className="flex flex-col gap-3">
+                    <ContentBox 
+                      label={lang === 'cn' ? (dailyTasks.length > 1 ? `项目 #${idx + 1} 内容` : '日清计划内容') : 'Daily Plan Content'}
+                      content={t.title[lang] || t.title['cn'] || ''}
+                      isEmpty={!t.title[lang] && !t.title['cn']}
+                      isAdmin={isAdminMode}
+                      onEdit={() => handleEditClick('daily', t)}
+                      isTitle
+                    />
+                    <ContentBox 
+                      label={lang === 'cn' ? (dailyTasks.length > 1 ? `项目 #${idx + 1} 清洁细则` : '清洁细则') : 'Cleaning Details'}
+                      content={t.details[lang] || t.details['cn'] || ''}
+                      isEmpty={!t.details[lang] && !t.details['cn']}
+                      isAdmin={isAdminMode}
+                      onEdit={() => handleEditClick('daily', t)}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </section>
 
@@ -545,58 +595,111 @@ const MainApp: React.FC = () => {
         <section className="animate-in slide-in-from-bottom-2 duration-500 delay-100">
            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
              <div className="flex items-center gap-2">
-               <span className={`text-xs font-bold px-2.5 py-1 rounded-md uppercase flex items-center gap-1 ${
-                 isWeeklyToday ? 'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-400' : 'bg-orange-100 text-orange-800'
-               }`}>
+               <span className="bg-orange-100 text-orange-800 text-xs font-bold px-2.5 py-1 rounded-md uppercase flex items-center gap-1">
                  <Calendar className="w-3.5 h-3.5 inline" />
-                 {weeklyTask?.dayOfWeek 
-                   ? (lang === 'cn' ? `每周${DAYS_OF_WEEK.find(d => d.val === weeklyTask.dayOfWeek)?.label.cn?.replace('星期', '')}` : `Every ${DAYS_OF_WEEK.find(d => d.val === weeklyTask.dayOfWeek)?.label.en}`)
-                   : (selectedDayObj?.label[lang] || selectedDayObj?.label['cn'])}
+                 <span>{lang === 'cn' ? '按周执行' : 'Weekly'}</span>
                </span>
                <h2 className="text-lg font-bold text-gray-800">{lang === 'cn' ? '周清计划' : 'Weekly Plan'}</h2>
-               {weeklyTask && (
-                 <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
-                   isWeeklyToday ? 'bg-emerald-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600'
-                 }`}>
-                   {isWeeklyToday 
-                     ? (lang === 'cn' ? '★ 今日执行' : '★ Today') 
-                     : (lang === 'cn' ? `排期: 星期${DAYS_OF_WEEK.find(d => d.val === weeklyTask.dayOfWeek)?.label.cn?.replace('星期', '')}` : `Scheduled: ${DAYS_OF_WEEK.find(d => d.val === weeklyTask.dayOfWeek)?.label.en}`)}
+               {weeklyTasks.length > 1 && (
+                 <span className="text-xs bg-orange-50 text-orange-700 font-bold px-2 py-0.5 rounded-full border border-orange-200">
+                   {weeklyTasks.length} 项
                  </span>
                )}
              </div>
 
-             {weeklyTask?.dayOfWeek && weeklyTask.dayOfWeek !== selectedDay && (
+             {isAdminMode && (
                <button
-                 onClick={() => setSelectedDay(weeklyTask.dayOfWeek!)}
-                 className="text-xs text-orange-600 hover:text-orange-800 hover:underline font-semibold flex items-center gap-1"
+                 onClick={() => handleEditClick('weekly', undefined)}
+                 className="text-xs bg-orange-50 hover:bg-orange-100 text-orange-700 px-2 py-1 rounded font-semibold flex items-center gap-1 transition-colors"
                >
-                 {lang === 'cn' 
-                   ? `切至 ${DAYS_OF_WEEK.find(d => d.val === weeklyTask.dayOfWeek)?.label.cn}` 
-                   : `Go to ${DAYS_OF_WEEK.find(d => d.val === weeklyTask.dayOfWeek)?.label.en}`}
+                 <PlusCircle className="w-3.5 h-3.5" />
+                 <span>{lang === 'cn' ? '添加周清' : 'Add Weekly'}</span>
                </button>
              )}
           </div>
 
-          <div className="flex flex-col gap-4">
-             <div className="w-full">
+          <div className="space-y-4">
+            {weeklyTasks.length === 0 ? (
+              <div className="flex flex-col gap-4">
                 <ContentBox 
                   label={lang === 'cn' ? '周清计划内容' : 'Weekly Plan Content'}
-                  content={weeklyTask?.title[lang] || weeklyTask?.title['cn'] || ''}
-                  isEmpty={!weeklyTask}
+                  content=""
+                  isEmpty={true}
                   isAdmin={isAdminMode}
-                  onEdit={() => handleEditClick('weekly', weeklyTask)}
+                  onEdit={() => handleEditClick('weekly', undefined)}
                   isTitle
                 />
-             </div>
-             <div className="w-full">
                 <ContentBox 
                   label={lang === 'cn' ? '清洁细则' : 'Cleaning Details'}
-                  content={weeklyTask?.details[lang] || weeklyTask?.details['cn'] || ''}
-                  isEmpty={!weeklyTask}
+                  content=""
+                  isEmpty={true}
                   isAdmin={isAdminMode}
-                  onEdit={() => handleEditClick('weekly', weeklyTask)}
+                  onEdit={() => handleEditClick('weekly', undefined)}
                 />
-             </div>
+              </div>
+            ) : (
+              weeklyTasks.map((t, idx) => {
+                const isThisWeeklyToday = t.dayOfWeek === selectedDay;
+                const dayLabel = DAYS_OF_WEEK.find(d => d.val === t.dayOfWeek)?.label[lang] || DAYS_OF_WEEK.find(d => d.val === t.dayOfWeek)?.label['cn'] || `星期${t.dayOfWeek}`;
+
+                return (
+                  <div key={t.id} className="bg-white/80 p-3 rounded-2xl border border-gray-200/80 shadow-sm space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-gray-100">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${
+                          isThisWeeklyToday ? 'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-400' : 'bg-orange-100 text-orange-800'
+                        }`}>
+                          每周{dayLabel.replace('星期', '')}
+                        </span>
+                        <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                          isThisWeeklyToday ? 'bg-emerald-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {isThisWeeklyToday ? (lang === 'cn' ? '★ 今日执行' : '★ Today') : (lang === 'cn' ? `排期: ${dayLabel}` : `Scheduled: ${dayLabel}`)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {t.dayOfWeek && t.dayOfWeek !== selectedDay && (
+                          <button
+                            onClick={() => setSelectedDay(t.dayOfWeek!)}
+                            className="text-xs text-orange-600 hover:text-orange-800 hover:underline font-semibold"
+                          >
+                            切至{dayLabel}
+                          </button>
+                        )}
+                        {isAdminMode && (
+                          <button
+                            onClick={() => handleEditClick('weekly', t)}
+                            className="text-orange-600 hover:text-orange-800 flex items-center gap-1 text-xs font-semibold"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>编辑</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                      <ContentBox 
+                        label={lang === 'cn' ? (weeklyTasks.length > 1 ? `项目 #${idx + 1} 内容` : '周清计划内容') : 'Weekly Plan Content'}
+                        content={t.title[lang] || t.title['cn'] || ''}
+                        isEmpty={!t.title[lang] && !t.title['cn']}
+                        isAdmin={isAdminMode}
+                        onEdit={() => handleEditClick('weekly', t)}
+                        isTitle
+                      />
+                      <ContentBox 
+                        label={lang === 'cn' ? (weeklyTasks.length > 1 ? `项目 #${idx + 1} 清洁细则` : '清洁细则') : 'Cleaning Details'}
+                        content={t.details[lang] || t.details['cn'] || ''}
+                        isEmpty={!t.details[lang] && !t.details['cn']}
+                        isAdmin={isAdminMode}
+                        onEdit={() => handleEditClick('weekly', t)}
+                      />
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </section>
 
@@ -604,65 +707,115 @@ const MainApp: React.FC = () => {
         <section className="animate-in slide-in-from-bottom-2 duration-500 delay-200">
            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
              <div className="flex items-center gap-2">
-               <span className={`text-xs font-bold px-2.5 py-1 rounded-md uppercase flex items-center gap-1 ${
-                 isMonthlyToday ? 'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-400' : 'bg-purple-100 text-purple-800'
-               }`}>
+               <span className="bg-purple-100 text-purple-800 text-xs font-bold px-2.5 py-1 rounded-md uppercase flex items-center gap-1">
                  <Calendar className="w-3.5 h-3.5 inline" />
-                 {monthlyTask?.weekOfMonth && monthlyTask?.dayOfWeek
-                   ? (lang === 'cn' 
-                       ? `第${monthlyTask.weekOfMonth}周 星期${DAYS_OF_WEEK.find(d => d.val === monthlyTask.dayOfWeek)?.label.cn?.replace('星期', '')}` 
-                       : `Wk ${monthlyTask.weekOfMonth}, ${DAYS_OF_WEEK.find(d => d.val === monthlyTask.dayOfWeek)?.label.en}`)
-                   : `Week ${selectedWeek}`}
+                 <span>{lang === 'cn' ? '按月执行' : 'Monthly'}</span>
                </span>
                <h2 className="text-lg font-bold text-gray-800">{lang === 'cn' ? '月清计划' : 'Monthly Plan'}</h2>
-               {monthlyTask && (
-                 <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
-                   isMonthlyToday ? 'bg-emerald-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600'
-                 }`}>
-                   {isMonthlyToday 
-                     ? (lang === 'cn' ? '★ 本周今日执行' : '★ Today') 
-                     : (lang === 'cn' 
-                         ? `排期: 第${monthlyTask.weekOfMonth}周 星期${DAYS_OF_WEEK.find(d => d.val === monthlyTask.dayOfWeek)?.label.cn?.replace('星期', '')}` 
-                         : `Scheduled: Wk ${monthlyTask.weekOfMonth}, ${DAYS_OF_WEEK.find(d => d.val === monthlyTask.dayOfWeek)?.label.en}`)}
+               {monthlyTasks.length > 1 && (
+                 <span className="text-xs bg-purple-50 text-purple-700 font-bold px-2 py-0.5 rounded-full border border-purple-200">
+                   {monthlyTasks.length} 项
                  </span>
                )}
              </div>
 
-             {monthlyTask?.weekOfMonth && monthlyTask?.dayOfWeek && (monthlyTask.weekOfMonth !== selectedWeek || monthlyTask.dayOfWeek !== selectedDay) && (
+             {isAdminMode && (
                <button
-                 onClick={() => {
-                   if (monthlyTask.weekOfMonth) setSelectedWeek(monthlyTask.weekOfMonth);
-                   if (monthlyTask.dayOfWeek) setSelectedDay(monthlyTask.dayOfWeek);
-                 }}
-                 className="text-xs text-purple-600 hover:text-purple-800 hover:underline font-semibold flex items-center gap-1"
+                 onClick={() => handleEditClick('monthly', undefined)}
+                 className="text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 px-2 py-1 rounded font-semibold flex items-center gap-1 transition-colors"
                >
-                 {lang === 'cn' 
-                   ? `切至 第${monthlyTask.weekOfMonth}周${DAYS_OF_WEEK.find(d => d.val === monthlyTask.dayOfWeek)?.label.cn}` 
-                   : `Go to Wk ${monthlyTask.weekOfMonth} ${DAYS_OF_WEEK.find(d => d.val === monthlyTask.dayOfWeek)?.label.en}`}
+                 <PlusCircle className="w-3.5 h-3.5" />
+                 <span>{lang === 'cn' ? '添加月清' : 'Add Monthly'}</span>
                </button>
              )}
           </div>
 
-          <div className="flex flex-col gap-4">
-             <div className="w-full">
+          <div className="space-y-4">
+            {monthlyTasks.length === 0 ? (
+              <div className="flex flex-col gap-4">
                 <ContentBox 
                   label={lang === 'cn' ? '月清计划内容' : 'Monthly Plan Content'}
-                  content={monthlyTask?.title[lang] || monthlyTask?.title['cn'] || ''}
-                  isEmpty={!monthlyTask}
+                  content=""
+                  isEmpty={true}
                   isAdmin={isAdminMode}
-                  onEdit={() => handleEditClick('monthly', monthlyTask)}
+                  onEdit={() => handleEditClick('monthly', undefined)}
                   isTitle
                 />
-             </div>
-             <div className="w-full">
                 <ContentBox 
                   label={lang === 'cn' ? '清洁细则' : 'Cleaning Details'}
-                  content={monthlyTask?.details[lang] || monthlyTask?.details['cn'] || ''}
-                  isEmpty={!monthlyTask}
+                  content=""
+                  isEmpty={true}
                   isAdmin={isAdminMode}
-                  onEdit={() => handleEditClick('monthly', monthlyTask)}
+                  onEdit={() => handleEditClick('monthly', undefined)}
                 />
-             </div>
+              </div>
+            ) : (
+              monthlyTasks.map((t, idx) => {
+                const isThisMonthlyToday = t.weekOfMonth === selectedWeek && t.dayOfWeek === selectedDay;
+                const weekLabel = WEEKS_OF_MONTH.find(w => w.val === t.weekOfMonth)?.label[lang] || WEEKS_OF_MONTH.find(w => w.val === t.weekOfMonth)?.label['cn'] || `第${t.weekOfMonth}周`;
+                const dayLabel = DAYS_OF_WEEK.find(d => d.val === t.dayOfWeek)?.label[lang] || DAYS_OF_WEEK.find(d => d.val === t.dayOfWeek)?.label['cn'] || `星期${t.dayOfWeek}`;
+
+                return (
+                  <div key={t.id} className="bg-white/80 p-3 rounded-2xl border border-gray-200/80 shadow-sm space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-gray-100">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${
+                          isThisMonthlyToday ? 'bg-emerald-100 text-emerald-800 ring-1 ring-emerald-400' : 'bg-purple-100 text-purple-800'
+                        }`}>
+                          {weekLabel} {dayLabel}
+                        </span>
+                        <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                          isThisMonthlyToday ? 'bg-emerald-600 text-white shadow-sm' : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {isThisMonthlyToday ? (lang === 'cn' ? '★ 本周今日执行' : '★ Today') : (lang === 'cn' ? `排期: ${weekLabel} ${dayLabel}` : `Scheduled: ${weekLabel} ${dayLabel}`)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {(t.weekOfMonth !== selectedWeek || t.dayOfWeek !== selectedDay) && (
+                          <button
+                            onClick={() => {
+                              if (t.weekOfMonth) setSelectedWeek(t.weekOfMonth);
+                              if (t.dayOfWeek) setSelectedDay(t.dayOfWeek);
+                            }}
+                            className="text-xs text-purple-600 hover:text-purple-800 hover:underline font-semibold"
+                          >
+                            切至计划执行日
+                          </button>
+                        )}
+                        {isAdminMode && (
+                          <button
+                            onClick={() => handleEditClick('monthly', t)}
+                            className="text-purple-600 hover:text-purple-800 flex items-center gap-1 text-xs font-semibold"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>编辑</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                      <ContentBox 
+                        label={lang === 'cn' ? (monthlyTasks.length > 1 ? `项目 #${idx + 1} 内容` : '月清计划内容') : 'Monthly Plan Content'}
+                        content={t.title[lang] || t.title['cn'] || ''}
+                        isEmpty={!t.title[lang] && !t.title['cn']}
+                        isAdmin={isAdminMode}
+                        onEdit={() => handleEditClick('monthly', t)}
+                        isTitle
+                      />
+                      <ContentBox 
+                        label={lang === 'cn' ? (monthlyTasks.length > 1 ? `项目 #${idx + 1} 清洁细则` : '清洁细则') : 'Cleaning Details'}
+                        content={t.details[lang] || t.details['cn'] || ''}
+                        isEmpty={!t.details[lang] && !t.details['cn']}
+                        isAdmin={isAdminMode}
+                        onEdit={() => handleEditClick('monthly', t)}
+                      />
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </section>
       </main>
