@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Department, Role } from '../types';
-import { X, Plus, Trash2, Save } from 'lucide-react';
-import { saveDepartment, deleteDepartment } from '../services/dataService';
+import { X, Plus, Trash2, Save, RotateCcw, FileSpreadsheet } from 'lucide-react';
+import { saveDepartment, deleteDepartment, restoreAllCloudData } from '../services/dataService';
 import { translateText } from '../services/geminiService';
 
 interface AdminDeptManagerProps {
   isOpen: boolean;
   onClose: () => void;
   departments: Department[];
+  onOpenExcelManager?: () => void;
 }
 
-export const AdminDeptManager: React.FC<AdminDeptManagerProps> = ({ isOpen, onClose, departments }) => {
+export const AdminDeptManager: React.FC<AdminDeptManagerProps> = ({ isOpen, onClose, departments, onOpenExcelManager }) => {
   const [editingDept, setEditingDept] = useState<Department | null>(null);
   const [newRoleNameCn, setNewRoleNameCn] = useState('');
   
@@ -203,6 +204,46 @@ export const AdminDeptManager: React.FC<AdminDeptManagerProps> = ({ isOpen, onCl
               </div>
             )}
           </div>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="p-3 border-t bg-gray-50 flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            {onOpenExcelManager && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onOpenExcelManager();
+                }}
+                className="flex items-center gap-1.5 text-xs text-teal-700 hover:text-teal-800 font-semibold px-2.5 py-1.5 rounded hover:bg-teal-50 border border-teal-300 bg-white"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5 text-teal-600" />
+                <span>Excel 模版与批量导入</span>
+              </button>
+            )}
+            <button
+              onClick={async () => {
+                if (window.confirm('确定要将云端所有部门与清洁计划恢复为标准预设计划吗？')) {
+                  try {
+                    await restoreAllCloudData();
+                    alert('云端数据已成功恢复！');
+                  } catch (e: any) {
+                    alert('恢复失败: ' + e?.message);
+                  }
+                }
+              }}
+              className="flex items-center gap-1.5 text-xs text-orange-600 hover:text-orange-700 font-semibold px-2 py-1.5 rounded hover:bg-orange-50 border border-orange-200"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>恢复标准云端计划</span>
+            </button>
+          </div>
+          <button
+            onClick={onClose}
+            className="px-4 py-1.5 text-xs font-semibold bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg"
+          >
+            关闭
+          </button>
         </div>
       </div>
     </div>
